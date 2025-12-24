@@ -32,7 +32,7 @@ export default function TodoForm() {
   };
 
   return (
-    <div className="mb-8 w-full">
+    <div className="mb-8 sm:w-full max-sm:w-[60%] max-sm:flex max-sm:justify-center">
       <div className="flex gap-2">
         <input
           ref={titleInputRef}
@@ -48,7 +48,7 @@ export default function TodoForm() {
         <button
           type="button"
           onClick={handleInitialClick}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold shadow-lg text-lg text-shadow-2xs"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold shadow-lg text-shadow-2xs"
         >
           ADD
         </button>
@@ -57,7 +57,7 @@ export default function TodoForm() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
               <div className="bg-gray-100 p-4 border-b flex justify-between items-center">
-                <h3 className="font-bold text-lg text-gray-800">상세 내용 입력</h3>
+                <h3 className="font-bold text-lg text-white text-shadow-lg">Description</h3>
                 <button onClick={() => setIsOpend(false)} className="text-gray-500 hover:text-red-500 text-xl">
                   &times;
                 </button>
@@ -75,9 +75,9 @@ export default function TodoForm() {
                   <button
                     type="button"
                     onClick={() => setIsOpend(false)}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                    className="px-6 py-3 rounded-lg font-bold transition text-red-600 hover:bg-gray-100"
                   >
-                    취소
+                    CANCEL
                   </button>
                   <SubmitButton />
                 </div>

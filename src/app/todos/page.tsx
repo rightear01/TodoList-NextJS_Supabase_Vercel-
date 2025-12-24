@@ -42,7 +42,7 @@ export default async function TodosPage() {
           </SignedOut>
         </div>
       </div>
-      <div className="flex flex-col items-center mb-8 w-full">
+      <div className="flex flex-col items-center mb-8 sm:w-full max-sm:w-[90%] mx-auto">
         <SignedIn>
           <h1 className="max-sm:text-xl sm:text-2xl font-bold mb-6 w-full flex justify-between items-center text-shadow-lg text-gray-700">
             Todo List [Total : {todos.length}]{' '}
