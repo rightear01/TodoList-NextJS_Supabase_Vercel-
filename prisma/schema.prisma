@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Todo {
+  id          String   @id @default(uuid()) // ID는 자동으로 유니크한 문자열(UUID) 생성
+  title       String
+  description String?  // 물음표(?)는 Optional을 의미
+  isCompleted Boolean  @default(false) // 기본값은 '안 됨(false)'
+  createdAt   DateTime @default(now()) // 생성 시간 자동 기록
+}
