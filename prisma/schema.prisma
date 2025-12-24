@@ -9,6 +9,7 @@ datasource db {
 }
 
 model Todo {
+  userId      String
   id          String   @id @default(uuid()) // ID는 자동으로 유니크한 문자열(UUID) 생성
   title       String
   description String?  // 물음표(?)는 Optional을 의미

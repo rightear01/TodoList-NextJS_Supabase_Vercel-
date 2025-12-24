@@ -32,7 +32,7 @@ export default function TodoForm() {
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 w-full">
       <div className="flex gap-2">
         <input
           ref={titleInputRef}
@@ -48,7 +48,7 @@ export default function TodoForm() {
         <button
           type="button"
           onClick={handleInitialClick}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transsition font-medium"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold shadow-lg text-lg text-shadow-2xs"
         >
           ADD
         </button>

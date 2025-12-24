@@ -5,6 +5,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma'; // 프리즈마 클라이언트 가져오기
+import { auth } from '@clerk/nextjs/server';
 
 // 1. 할 일 추가 (Create)
 export async function addTodoAction(formData: FormData) {
@@ -13,11 +14,18 @@ export async function addTodoAction(formData: FormData) {
 
   if (!title) return;
 
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error('로그인 사용자가 아닙니다.');
+  }
+
   await prisma.todo.create({
     data: {
       title,
       description,
       isCompleted: false,
+      userId: userId,
     },
   });
 
@@ -25,18 +33,18 @@ export async function addTodoAction(formData: FormData) {
 }
 
 // 2. 할 일 삭제 (Delete)
-export async function deleteTodoAction(id: string) {
+export async function deleteTodoAction(id: string, userId: string) {
   await prisma.todo.delete({
-    where: { id }, // id가 일치하는 녀석 삭제
+    where: { id, userId }, // id가 일치하는 녀석 삭제
   });
 
   revalidatePath('/todos');
 }
 
 // 3. 할 일 완료 토글 (Update)
-export async function toggleTodoAction(id: string, isCompleted: boolean) {
+export async function toggleTodoAction(id: string, isCompleted: boolean, userId: string) {
   await prisma.todo.update({
-    where: { id },
+    where: { id, userId },
     data: {
       isCompleted: isCompleted,
     },
