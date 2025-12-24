@@ -14,13 +14,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     startTransition(() => {
-      toggleTodoAction(todo.id, e.target.checked);
+      toggleTodoAction(todo.id, e.target.checked, todo.userId);
     });
   };
 
   const handleDelete = () => {
     startTransition(() => {
-      deleteTodoAction(todo.id);
+      deleteTodoAction(todo.id, todo.userId);
     });
   };
 
