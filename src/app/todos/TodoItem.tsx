@@ -12,6 +12,8 @@ interface TodoItemProps {
 export default function TodoItem({ todo }: TodoItemProps) {
   const [isPending, startTransition] = useTransition();
 
+  console.log('TodoItem Rendered:', typeof todo.id);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     startTransition(() => {
       toggleTodoAction(todo.id, e.target.checked, todo.userId);

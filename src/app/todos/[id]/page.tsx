@@ -6,14 +6,16 @@ import { prisma } from '@/lib/prisma';
 
 // Next.js 15부터는 주소창의 동적 세그먼트를 비동기적으로 바뀌었다. 안그러면 에러 남
 interface TodoDetailPageProps {
-  params: Promise<{ id: string }>; // 비동기적으로 params에서 id 추출 <- <String>이 될 수도 있다. 예언하는 느낌이기 때문에 비동기로 적용됨.
+  params: Promise<{ id: string | null }>; // 비동기적으로 params에서 id 추출 <- <String>이 될 수도 있다. 예언하는 느낌이기 때문에 비동기로 적용됨.
 }
 
 export default async function TodoDetailPage({ params }: TodoDetailPageProps) {
   const { id } = await params; // 비동기로 url의 queryString에서 id를 비동기로 추출하여 동기처럼 사용하는 거임. await 꼭 붙여야 함.
-  const todo = await prisma.todo.findUnique({
-    where: { id },
-  });
+  const todo = id
+    ? await prisma.todo.findUnique({
+        where: { id },
+      })
+    : null;
 
   if (!todo) {
     notFound();
