@@ -59,11 +59,11 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
   };
 
   return (
-    <div className="mb-8 sm:w-full max-sm:w-[60%] max-sm:flex max-sm:justify-center">
+    <div className="mb-8 sm:w-full">
       <div className="fle-col gap-2 ">
-        <div className="flex justify-between w-full gap-2 h-full">
+        <div className="flex justify-between w-full gap-2 h-full max-sm:flex-col sm:flex-row">
           <Search />
-          <div>
+          <div className="flex">
             <input
               ref={titleInputRef}
               type="text"

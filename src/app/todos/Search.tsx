@@ -27,12 +27,11 @@ export default function Search() {
         Search
       </label>
       <input
-        className="peer block w-full rounded-sm border border-gray-200 text-sm outline-1 placeholder:text-gray-500"
+        className="w-full rounded-sm border border-gray-200 text-sm outline-1 max-sm:p-2"
         placeholder="Search Todo..."
         onChange={(e) => handleSearch(e.target?.value)}
         defaultValue={searchParams.get('query')?.toString()}
       />
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
     </div>
   );
 }
