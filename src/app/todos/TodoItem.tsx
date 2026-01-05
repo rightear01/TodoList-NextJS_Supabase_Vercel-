@@ -3,26 +3,25 @@
 import { Todo } from '../types';
 import Link from 'next/link';
 import { useTransition } from 'react';
-import { deleteTodoAction, toggleTodoAction } from './action';
 
 interface TodoItemProps {
   todo: Todo;
+  onToggle: () => void;
+  onDelete: () => void;
 }
 
-export default function TodoItem({ todo }: TodoItemProps) {
+export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const [isPending, startTransition] = useTransition();
 
-  console.log('TodoItem Rendered:', typeof todo.id);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = () => {
     startTransition(() => {
-      toggleTodoAction(todo.id, e.target.checked, todo.userId);
+      onToggle();
     });
   };
 
   const handleDelete = () => {
     startTransition(() => {
-      deleteTodoAction(todo.id, todo.userId);
+      onDelete();
     });
   };
 

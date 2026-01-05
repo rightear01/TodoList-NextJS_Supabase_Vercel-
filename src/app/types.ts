@@ -1,6 +1,6 @@
 export interface Todo {
   id: string;
-  title: string;
+  title: string | null;
   // 1. description이 null일 수도 있다고 허용해줍니다.
   description?: string | null;
   isCompleted: boolean;

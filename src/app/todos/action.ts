@@ -9,46 +9,56 @@ import { auth } from '@clerk/nextjs/server';
 
 // 1. 할 일 추가 (Create)
 export async function addTodoAction(formData: FormData) {
-  const title = formData.get('title')?.toString();
-  const description = formData.get('description')?.toString();
+  try {
+    const title = formData.get('title')?.toString();
+    if (!title) return { success: false, error: 'Title is required' };
 
-  if (!title) return;
+    const description = formData.get('description')?.toString();
 
-  const { userId } = await auth();
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: 'User not authenticated' };
 
-  if (!userId) {
-    throw new Error('로그인 사용자가 아닙니다.');
+    await prisma.todo.create({
+      data: {
+        title,
+        description,
+        isCompleted: false,
+        userId: userId,
+      },
+    });
+
+    revalidatePath('/todos');
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: `${e}` };
   }
-
-  await prisma.todo.create({
-    data: {
-      title,
-      description,
-      isCompleted: false,
-      userId: userId,
-    },
-  });
-
-  revalidatePath('/todos');
 }
 
 // 2. 할 일 삭제 (Delete)
 export async function deleteTodoAction(id: string, userId: string) {
-  await prisma.todo.delete({
-    where: { id, userId }, // id가 일치하는 녀석 삭제
-  });
-
-  revalidatePath('/todos');
+  try {
+    await prisma.todo.delete({
+      where: { id, userId }, // id가 일치하는 녀석 삭제
+    });
+    revalidatePath('/todos');
+  } catch (e) {
+    return { success: false, error: `${e}` };
+  }
 }
 
 // 3. 할 일 완료 토글 (Update)
 export async function toggleTodoAction(id: string, isCompleted: boolean, userId: string) {
-  await prisma.todo.update({
-    where: { id, userId },
-    data: {
-      isCompleted: isCompleted,
-    },
-  });
+  try {
+    await prisma.todo.update({
+      where: { id, userId },
+      data: {
+        isCompleted: isCompleted,
+      },
+    });
 
-  revalidatePath('/todos');
+    revalidatePath('/todos');
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: `${e}` };
+  }
 }

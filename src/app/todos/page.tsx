@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
-import Search from './Search';
 import TodoList from './TodoList';
 // page.tsx는 기본적으로 서버 컴포넌트로 동작한다.
 // 무거운 데이터베이스 쿼리 작업을 서버에서 처리하여 클라이언트로 필요한 데이터만 전송할 수 있다.
@@ -49,7 +48,6 @@ export default async function TodosPage({ searchParams }: { searchParams: Promis
               <UserButton />
             </div>
           </h1>
-
           <ul className="space-y-4 w-full">
             <TodoList initialTodos={todos} userId={userId} />
           </ul>

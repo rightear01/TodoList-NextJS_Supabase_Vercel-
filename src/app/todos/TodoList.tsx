@@ -2,25 +2,42 @@
 
 import { Todo } from '../types';
 import TodoItem from './TodoItem';
-import { addTodoAction } from './action';
+import { addTodoAction, toggleTodoAction, deleteTodoAction } from './action';
 import { useOptimistic, useRef, useState, useTransition } from 'react';
 import SubmitButton from './SubmitButton';
 import Search from './Search';
 
+type OptimisticAction =
+  | { type: 'ADD'; payload: Todo }
+  | { type: 'TOGGLE'; payload: string }
+  | { type: 'DELETE'; payload: string };
+
 export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[]; userId: string | null }) {
-  // 1st Param : 초기 상태 값
-  // 2nd Param : 낙관적 업데이트를 처리하는 함수
-  const [optimisticTodos, addOptimisticTodo] = useOptimistic(initialTodos, (state, newTodo: Todo) => [
-    newTodo,
-    ...state,
-  ]);
-
   const titleInputRef = useRef<HTMLInputElement>(null);
-
   const [isOpen, setIsOpend] = useState(false);
   const [title, setTitle] = useState('');
-
   const [isPanding, startTransition] = useTransition();
+
+  // 1st Param : 초기 상태 값
+  // 2nd Param : 낙관적 업데이트를 처리하는 함수
+  // const [optimisticTodos, addOptimisticTodo] = useOptimistic(initialTodos, (state, newTodo: Todo) => [
+  //   newTodo,
+  //   ...state,
+  // ]);
+  const [optimisticTodos, dispatchOptimisticTodo] = useOptimistic(initialTodos, (state, action: OptimisticAction) => {
+    {
+      switch (action.type) {
+        case 'ADD':
+          return [action.payload, ...state];
+        case 'TOGGLE':
+          return state.map((todo) => (todo.id === action.payload ? { ...todo, isCompleted: !todo.isCompleted } : todo));
+        case 'DELETE':
+          return state.filter((todo) => todo.id !== action.payload);
+        default:
+          return state;
+      }
+    }
+  });
 
   const handleInitialClick = () => {
     if (!title.trim()) {
@@ -28,7 +45,6 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
       alert('할 일 내용을 입력해주세요.');
       return;
     }
-
     setIsOpend(true);
   };
 
@@ -46,15 +62,38 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
 
     startTransition(async () => {
       // 낙관적 업데이트 함수 호출 <- UI 즉시 반영
-      addOptimisticTodo(newTodo);
-
-      // 폼 초기화
-      setTitle('');
+      dispatchOptimisticTodo({ type: 'ADD', payload: newTodo });
 
       // 실제 서버 액션 호출 <- 데이터베이스에 반영
-      await addTodoAction(formData);
+      const result = await addTodoAction(formData);
+      if (!result.success) {
+        alert(`Error: ${result.error}`);
+      } else {
+        // 폼 초기화
+        setTitle('');
+        setIsOpend(false);
+      }
+    });
+  };
 
-      setIsOpend(false);
+  const handleToggleTodo = async (id: string) => {
+    const todo = optimisticTodos.find((t) => t.id === id);
+    if (!todo) return;
+    startTransition(async () => {
+      dispatchOptimisticTodo({ type: 'TOGGLE', payload: id });
+      // 실제 서버 액션 호출 <- 데이터베이스에 반영
+      const result = await toggleTodoAction(id, !todo.isCompleted, userId!);
+      if (!result.success) {
+        alert(`Error: ${result.error}`);
+      }
+    });
+  };
+
+  // Todo 삭제 핸들러 (예시)
+  const handleDelete = async (id: string) => {
+    startTransition(async () => {
+      dispatchOptimisticTodo({ type: 'DELETE', payload: id });
+      await deleteTodoAction(id, optimisticTodos.find((todo) => todo.id === id)?.userId ?? '');
     });
   };
 
@@ -87,7 +126,12 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
 
         <ul className="mt-5">
           {optimisticTodos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} />
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onToggle={() => handleToggleTodo(todo.id)}
+              onDelete={() => handleDelete(todo.id)}
+            />
           ))}
         </ul>
         {isOpen && (
