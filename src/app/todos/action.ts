@@ -6,49 +6,74 @@
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma'; // 프리즈마 클라이언트 가져오기
 import { auth } from '@clerk/nextjs/server';
+import { createTodoSchema } from './schema';
+import { ActionResponse } from '../types';
 
 // 1. 할 일 추가 (Create)
-export async function addTodoAction(formData: FormData) {
+export async function addTodoAction(formData: FormData): Promise<ActionResponse> {
   try {
-    const title = formData.get('title')?.toString();
-    if (!title) return { success: false, error: 'Title is required' };
+    // 1. FormData에서 값 꺼내기
+    // (여기서는 아직 'string | File | null' 등 무엇인지 모르는 상태)
+    const rawInput = {
+      title: formData.get('title'),
+      description: formData.get('description'),
+    };
 
-    const description = formData.get('description')?.toString();
+    // 2. Zod 검증 수행
+    const validation = createTodoSchema.safeParse(rawInput);
+
+    if (!validation.success) {
+      return { success: false, error: '입력값이 올바르지 않습니다.' };
+    }
+
+    // validation.success가 true면, validation.data는 
+    // 자동으로 'CreateTodoInput' 타입(title: string)으로 추론된다.
+    // 더 이상 'as ...'로 타입을 우겨넣을 필요 없음.
+    
+    // validation.data = { title: string, description?: string | null }
+    const validData = validation.data; 
 
     const { userId } = await auth();
     if (!userId) return { success: false, error: 'User not authenticated' };
 
     await prisma.todo.create({
       data: {
-        title,
-        description,
+        title: validData.title, // 이제 TS가 string임을 100% 확신함
+        description: validData.description,
         isCompleted: false,
         userId: userId,
       },
     });
 
     revalidatePath('/todos');
-    return { success: true };
+    return { success: true, data: undefined };
   } catch (e) {
     return { success: false, error: `${e}` };
   }
 }
 
 // 2. 할 일 삭제 (Delete)
-export async function deleteTodoAction(id: string, userId: string) {
+export async function deleteTodoAction(id: string) : Promise<ActionResponse>{
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: 'User not authenticated' };
+
     await prisma.todo.delete({
       where: { id, userId }, // id가 일치하는 녀석 삭제
     });
     revalidatePath('/todos');
+    return { success : true, data: undefined }
   } catch (e) {
     return { success: false, error: `${e}` };
   }
 }
 
 // 3. 할 일 완료 토글 (Update)
-export async function toggleTodoAction(id: string, isCompleted: boolean, userId: string) {
+export async function toggleTodoAction(id: string, isCompleted: boolean) : Promise<ActionResponse> {
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: 'User not authenticated' };
+    
     await prisma.todo.update({
       where: { id, userId },
       data: {
@@ -57,7 +82,7 @@ export async function toggleTodoAction(id: string, isCompleted: boolean, userId:
     });
 
     revalidatePath('/todos');
-    return { success: true };
+    return { success: true, data : undefined };
   } catch (e) {
     return { success: false, error: `${e}` };
   }

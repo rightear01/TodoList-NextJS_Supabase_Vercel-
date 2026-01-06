@@ -48,12 +48,19 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
     setIsOpend(true);
   };
 
+  // TypeScript는 자동 추론이 내재되어 있다.
+  // 만약 지정한 타입에서 벗어나는 경우의 수가 생기는 경우에는 문제가 발생한다.
+  // 때문에, 문제가 될 수 있는 경우의 수는 분기 처리와 같은 방법으로 해결해야한다.
   const handleAddTodo = async (formData: FormData) => {
-    const title = formData.get('title') as string;
+    const title = formData.get('title');
+    if(typeof title !== 'string' || !title.trim()){
+      alert('제목에 문제가 있습니다.');
+      return;
+    }
 
     const newTodo: Todo = {
       id: Math.random().toString(),
-      title,
+      title: title,
       isCompleted: false,
       createdAt: new Date(),
       userId: userId ? userId : '',
@@ -82,18 +89,18 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
     startTransition(async () => {
       dispatchOptimisticTodo({ type: 'TOGGLE', payload: id });
       // 실제 서버 액션 호출 <- 데이터베이스에 반영
-      const result = await toggleTodoAction(id, !todo.isCompleted, userId!);
+      const result = await toggleTodoAction(id, !todo.isCompleted);
       if (!result.success) {
         alert(`Error: ${result.error}`);
       }
     });
   };
 
-  // Todo 삭제 핸들러 (예시)
+  // Todo 삭제 핸들러
   const handleDelete = async (id: string) => {
     startTransition(async () => {
       dispatchOptimisticTodo({ type: 'DELETE', payload: id });
-      await deleteTodoAction(id, optimisticTodos.find((todo) => todo.id === id)?.userId ?? '');
+      await deleteTodoAction(id);
     });
   };
 
