@@ -6,6 +6,7 @@ import { addTodoAction, toggleTodoAction, deleteTodoAction } from './action';
 import { useOptimistic, useRef, useState, useTransition } from 'react';
 import SubmitButton from './SubmitButton';
 import Search from './Search';
+import { useSearchParams } from 'next/navigation';
 
 type OptimisticAction =
   | { type: 'ADD'; payload: Todo }
@@ -13,6 +14,8 @@ type OptimisticAction =
   | { type: 'DELETE'; payload: string };
 
 export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[]; userId: string | null }) {
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query');
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpend] = useState(false);
   const [title, setTitle] = useState('');
@@ -132,14 +135,35 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
         </div>
 
         <ul className="mt-5">
-          {optimisticTodos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onToggle={() => handleToggleTodo(todo.id)}
-              onDelete={() => handleDelete(todo.id)}
-            />
-          ))}
+          {optimisticTodos.length === 0 ? (
+            <div className='text-center py-12 bg-gray-50 rounded-lg border border-gray-300 mt-5'>
+              {query ? (
+                <p className='text-gray-500 text-lg'>
+                  <span className='font-bold text-gray-700'>`{query}`</span>에 대한 검색 결과가 없습니다.
+                </p>
+              ) : (
+                <p className='text-gray-500 text-lg'>
+                  할 일이 아직 없습니다.<br/>
+                  새로운 Todo를 생성해 보세요!
+                </p>
+              )}
+            </div>
+          ) : (
+            <ul className='mt-5'>
+              {
+                optimisticTodos.map(todo => (
+                  // handleDelete(todo.id) 의미: "리액트야, 지금 당장 이 함수를 실행하고, 그 결과값을 onDelete에 넣어줘"
+                  // . () => handleDelete(todo.id) 의미: "리액트야, 사용자가 이 버튼을 클릭하면 나중에 이 함수를 실행해 줘"
+                  <TodoItem 
+                    key={todo.id} 
+                    todo={todo} 
+                    onDelete={() => handleDelete(todo.id)} 
+                    onToggle={() => handleToggleTodo(todo.id)}/>
+                ))
+              }
+            </ul>
+          )
+          }
         </ul>
         {isOpen && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

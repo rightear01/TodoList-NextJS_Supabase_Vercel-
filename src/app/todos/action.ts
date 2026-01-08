@@ -8,9 +8,10 @@ import { prisma } from '@/lib/prisma'; // 프리즈마 클라이언트 가져오
 import { auth } from '@clerk/nextjs/server';
 import { createTodoSchema } from './schema';
 import { ActionResponse } from '../types';
+import { Todo } from '@prisma/client';
 
 // 1. 할 일 추가 (Create)
-export async function addTodoAction(formData: FormData): Promise<ActionResponse> {
+export async function addTodoAction(formData: FormData): Promise<ActionResponse<Todo>> {
   try {
     // 1. FormData에서 값 꺼내기
     // (여기서는 아직 'string | File | null' 등 무엇인지 모르는 상태)
@@ -36,7 +37,7 @@ export async function addTodoAction(formData: FormData): Promise<ActionResponse>
     const { userId } = await auth();
     if (!userId) return { success: false, error: 'User not authenticated' };
 
-    await prisma.todo.create({
+    const newTodo = await prisma.todo.create({
       data: {
         title: validData.title, // 이제 TS가 string임을 100% 확신함
         description: validData.description,
@@ -46,7 +47,7 @@ export async function addTodoAction(formData: FormData): Promise<ActionResponse>
     });
 
     revalidatePath('/todos');
-    return { success: true, data: undefined };
+    return { success: true, data: newTodo };
   } catch (e) {
     return { success: false, error: `${e}` };
   }
@@ -69,20 +70,20 @@ export async function deleteTodoAction(id: string) : Promise<ActionResponse>{
 }
 
 // 3. 할 일 완료 토글 (Update)
-export async function toggleTodoAction(id: string, isCompleted: boolean) : Promise<ActionResponse> {
+export async function toggleTodoAction(id: string, isCompleted: boolean) : Promise<ActionResponse<Todo>> {
   try {
     const { userId } = await auth();
     if (!userId) return { success: false, error: 'User not authenticated' };
     
-    await prisma.todo.update({
+    const newTodo = await prisma.todo.update({
       where: { id, userId },
       data: {
         isCompleted: isCompleted,
       },
     });
-
+    
     revalidatePath('/todos');
-    return { success: true, data : undefined };
+    return { success: true, data : newTodo };
   } catch (e) {
     return { success: false, error: `${e}` };
   }
