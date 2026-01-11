@@ -8,6 +8,8 @@ import { useOptimistic, useRef, useState, useTransition } from 'react';
 import SubmitButton from './SubmitButton';
 import Search from './Search';
 import { useSearchParams } from 'next/navigation';
+import TodoFilter from './components/TodoFilter';
+import { UserButton } from '@clerk/nextjs';
 
 type OptimisticAction =
   | { type: 'ADD'; payload: Todo }
@@ -113,6 +115,10 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
 
   return (
     <div className="mb-8 sm:w-full">
+      <div className='flex justify-between'>
+        <TodoFilter/>
+        <UserButton />
+      </div>
       <div className="fle-col gap-2 ">
         <div className="flex justify-between w-full gap-2 h-full max-sm:flex-col sm:flex-row">
           <Search />

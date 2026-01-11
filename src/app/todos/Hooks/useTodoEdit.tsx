@@ -23,13 +23,13 @@ const useTodoEdit = () : UseTodoEditReturn => {
 
     const startEditing = (todo : Todo) => {
 	    setEditingId(todo.id);
-        setEditTitle(todo.title);
-        setEditDesc(todo.description || '')
+      setEditTitle(todo.title);
+      setEditDesc(todo.description || '')
     }
 
     const cancelEditing = () => {
-        setEditingId(null);
-        setEditTitle('');
+      setEditingId(null);
+      setEditTitle('');
     }
 
     const saveEdit = async () => {
@@ -37,8 +37,8 @@ const useTodoEdit = () : UseTodoEditReturn => {
         const titleToSave = editTitle.trim().length === 0 ? '제목 없음' : editTitle;
         const res = await editTodoAction(editingId, titleToSave, editDesc);
         if (res.success) {
-                toast.success('저장에 성공했습니다.');
-                setEditingId(null);
+          toast.success('저장에 성공했습니다.');
+          setEditingId(null);
         } else toast.error(res.error);
     }
 
