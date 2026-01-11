@@ -14,5 +14,6 @@ export type ActionResponse<T = void> =
   | { success: true; data: T }          // 성공 시: data가 반드시 있음 (void면 없어도 됨)
   | { success: false; error: string };  // 실패 시: error 메시지가 반드시 있음
 
+export type AuthResponse = string | null;
   
 

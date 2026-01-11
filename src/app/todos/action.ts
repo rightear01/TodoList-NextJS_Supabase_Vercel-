@@ -32,7 +32,7 @@ export async function addTodoAction(formData: FormData): Promise<ActionResponse<
     // 더 이상 'as ...'로 타입을 우겨넣을 필요 없음.
     
     // validation.data = { title: string, description?: string | null }
-    const validData = validation.data; 
+    const validData = validation.data;
 
     const { userId } = await auth();
     if (!userId) return { success: false, error: 'User not authenticated' };
@@ -83,7 +83,26 @@ export async function toggleTodoAction(id: string, isCompleted: boolean) : Promi
     });
     
     revalidatePath('/todos');
-    return { success: true, data : newTodo };
+    return { success: true, data: newTodo };
+  } catch (e) {
+    return { success: false, error: `${e}` };
+  }
+}
+
+export async function editTodoAction(id: string, title: string, desc: string) : Promise<ActionResponse<Todo>>{
+  try {
+    const { userId } = await auth();
+    if(!userId) return { success: false, error: 'User not authenticated' };
+
+    const editedTodo = await prisma.todo.update({
+      where: {id, userId},
+      data: {
+        title: title,
+        description: desc,
+      }
+    })
+    revalidatePath('/todos');
+    return { success: true, data: editedTodo };
   } catch (e) {
     return { success: false, error: `${e}` };
   }

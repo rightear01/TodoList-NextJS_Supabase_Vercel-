@@ -2,7 +2,7 @@
 
 import { Todo } from '../types';
 import TodoItem from './TodoItem';
-import { addTodoAction, toggleTodoAction, deleteTodoAction } from './action';
+import { addTodoAction, toggleTodoAction, deleteTodoAction, editTodoAction } from './action';
 import { useOptimistic, useRef, useState, useTransition } from 'react';
 import SubmitButton from './SubmitButton';
 import Search from './Search';
@@ -11,7 +11,8 @@ import { useSearchParams } from 'next/navigation';
 type OptimisticAction =
   | { type: 'ADD'; payload: Todo }
   | { type: 'TOGGLE'; payload: string }
-  | { type: 'DELETE'; payload: string };
+  | { type: 'DELETE'; payload: string }
+  | { type: 'UPDATE'; payload: string }
 
 export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[]; userId: string | null }) {
   const searchParams = useSearchParams();
@@ -36,6 +37,8 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
           return state.map((todo) => (todo.id === action.payload ? { ...todo, isCompleted: !todo.isCompleted } : todo));
         case 'DELETE':
           return state.filter((todo) => todo.id !== action.payload);
+        case 'UPDATE':
+          return state.map((todo) => (todo.id === action.payload ? { ...todo, title: todo.title } : todo));
         default:
           return state;
       }
@@ -182,6 +185,7 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
               <form action={handleAddTodo} className="p-6 flex flex-col gap-4">
                 <input type="hidden" name="title" value={title} />
                 <div className="text-xl font-bold text-blue-600 mb-2">{title}</div>
+                
                 <textarea
                   name="description"
                   placeholder="상세 설명을 입력하세요 (선택사항)"
@@ -200,6 +204,7 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
                   <SubmitButton isPanding={isPanding} />
                 </div>
               </form>
+
             </div>
           </div>
         )}
