@@ -1,6 +1,7 @@
 'use client';
 
 import { Todo } from '../types';
+import toast from 'react-hot-toast';
 import TodoItem from './TodoItem';
 import { addTodoAction, toggleTodoAction, deleteTodoAction } from './action';
 import { useOptimistic, useRef, useState, useTransition } from 'react';
@@ -45,7 +46,7 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
   const handleInitialClick = () => {
     if (!title.trim()) {
       titleInputRef.current?.focus();
-      alert('할 일 내용을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
     setIsOpend(true);
@@ -57,7 +58,7 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
   const handleAddTodo = async (formData: FormData) => {
     const title = formData.get('title');
     if(typeof title !== 'string' || !title.trim()){
-      alert('제목에 문제가 있습니다.');
+      toast.error('제목에 문제가 있습니다.');
       return;
     }
 
@@ -77,9 +78,9 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
       // 실제 서버 액션 호출 <- 데이터베이스에 반영
       const result = await addTodoAction(formData);
       if (!result.success) {
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       } else {
-        // 폼 초기화
+        toast.success('할 일이 추가되었습니다!');
         setTitle('');
         setIsOpend(false);
       }
@@ -94,7 +95,7 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
       // 실제 서버 액션 호출 <- 데이터베이스에 반영
       const result = await toggleTodoAction(id, !todo.isCompleted);
       if (!result.success) {
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       }
     });
   };
@@ -103,7 +104,10 @@ export default function TodoList({ initialTodos, userId }: { initialTodos: Todo[
   const handleDelete = async (id: string) => {
     startTransition(async () => {
       dispatchOptimisticTodo({ type: 'DELETE', payload: id });
-      await deleteTodoAction(id);
+      const result = await deleteTodoAction(id);
+      if (!result.success) {
+        toast.error(result.error);
+      }else toast.success('삭제가 완료되었습니다.');
     });
   };
 

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="ko">
         <body suppressHydrationWarning={true}>
+          <Toaster position="top-center" />
           <nav className="border-b border-gray-200 p-4">
             <div className="max-w-4xl mx-auto flex justify-between items-center">
               <Link href="/" className="text-xl font-bold text-blue-600">

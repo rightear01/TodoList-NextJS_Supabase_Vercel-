@@ -75,7 +75,7 @@ export default function TodoDetailClient({ todo }: { todo: Todo }) {
       </div>
       <div className="mt-8 pt-6 border-t flex justify-between items-center">
         <span className="text-sm text-gray-500">
-          생성일: {new Date(todo.createdAt).toLocaleDateString('ko-KR').toString()}
+          생성일: {new Date(todo.createdAt).toLocaleDateString('ko-KR')}
         </span>
         <div>
           {editingId === todo.id ? (
