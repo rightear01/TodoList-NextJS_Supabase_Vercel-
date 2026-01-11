@@ -92,6 +92,9 @@ export async function toggleTodoAction(id: string, isCompleted: boolean) : Promi
 export async function editTodoAction(id: string, title: string, desc: string) : Promise<ActionResponse<Todo>>{
   try {
     const { userId } = await auth();
+    console.log(title)
+    console.log(desc)
+    console.log(userId)
     if(!userId) return { success: false, error: 'User not authenticated' };
 
     const editedTodo = await prisma.todo.update({

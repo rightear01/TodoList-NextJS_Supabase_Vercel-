@@ -5,7 +5,7 @@ export interface Todo {
   description?: string | null;
   isCompleted: boolean;
   // 2. createdAt은 이제 숫자가 아니라 진짜 날짜 객체(Date)입니다.
-  createdAt: Date;
+  createdAt: string;
   userId: string;
 }
 

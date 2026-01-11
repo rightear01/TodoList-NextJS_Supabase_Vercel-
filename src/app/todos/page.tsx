@@ -25,6 +25,11 @@ export default async function TodosPage({ searchParams }: { searchParams: Promis
       })
     : [];
 
+    const safeTodos = todos.map((todo) => ({
+      ...todo,
+      createdAt: todo.createdAt.toISOString(), // Date -> String 변환!
+    }));
+
   return (
     <div className="max-w-2xl mx-auto mt-8 p-4">
       <div className="flex flex-col items-center">
@@ -49,7 +54,7 @@ export default async function TodosPage({ searchParams }: { searchParams: Promis
             </div>
           </h1>
           <ul className="space-y-4 w-full">
-            <TodoList initialTodos={todos} userId={userId} />
+            <TodoList initialTodos={safeTodos} userId={userId} />
           </ul>
         </SignedIn>
       </div>

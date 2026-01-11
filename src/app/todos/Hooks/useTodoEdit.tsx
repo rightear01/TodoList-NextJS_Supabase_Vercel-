@@ -21,7 +21,7 @@ const useTodoEdit = () : UseTodoEditReturn => {
     const [editTitle, setEditTitle] = useState('');
 
     const startEditing = (todo : Todo) => {
-        setEditingId(todo.id);
+	    setEditingId(todo.id);
         setEditTitle(todo.title);
         setEditDesc(todo.description || '')
     }
@@ -33,8 +33,14 @@ const useTodoEdit = () : UseTodoEditReturn => {
 
     const saveEdit = async () => {
         if(!editingId) return;
-        await editTodoAction(editingId, editTitle, editDesc);
-        setEditingId(null);
+        const titleToSave = editTitle.trim().length === 0 ? '제목 없음' : editTitle;
+        const res = await editTodoAction(editingId, titleToSave, editDesc);
+        if (res.success) {
+                alert('저장에 성공했습니다.');
+                setEditingId(null);
+        } else {
+            alert(res.error); // 여기에 무엇이 뜨는지 확인이 필요합니다!
+        }
     }
 
     return {

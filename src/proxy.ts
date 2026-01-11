@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 // 1. 로그인 없이도 볼 수 있는 '공개 경로'를 정의합니다.
-const isPublicRoute = createRouteMatcher(['/', '/todos(.*)']);
+const isPublicRoute = createRouteMatcher(['/']);
 
 export default clerkMiddleware(async (auth, request) => {
   // 2. 공개 경로가 아니라면 보안 검사를 수행합니다.

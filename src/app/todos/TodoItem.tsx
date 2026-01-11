@@ -3,7 +3,6 @@
 import { Todo } from '../types';
 import Link from 'next/link';
 import { useTransition } from 'react';
-import EditHandler from './common/useTodoEdit'
 
 interface TodoItemProps {
   todo: Todo;
@@ -27,7 +26,7 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   };
 
   // 💡 날짜 포맷팅 (Pro Tip: 안전하게 new Date 한 번 더 감싸주기)
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
